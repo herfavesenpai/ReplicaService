@@ -438,11 +438,13 @@ function Replica:IncrementValue(path, value)
 	for i = 1, #path_array - 1 do
 		pointer = pointer[path_array[i]]
 	end
-	assert(type(pointer[path_array[#path_array]]) == "number", "[ReplicaService] Tried to increment non-numeric value")
-	pointer[path_array[#path_array]] += value
 
-	local incrementedValue = pointer[path_array[#path_array]]
-	print('incrementedValue:', incrementedValue)
+	if pointer[path_array[#path_array]] then
+		pointer[path_array[#path_array]] += value
+	else
+		pointer[path_array[#path_array]] = value
+	end
+
 	-- Replicate change:
 	if WriteFunctionFlag == false then
 		local id = self.Id
@@ -493,8 +495,13 @@ function Replica:IncrementValues(path, values)
 
 	local incrementedValues = {}
 	for key, value in pairs(values) do
-		if type(pointer[key]) == "number" then
-			pointer[key] += value
+		if type(pointer[key]) == "number" or pointer[key] == "nil" then
+			if pointer[key] then
+				pointer[key] += value
+			else
+				pointer[key] = value
+			end
+			
 			incrementedValues[key] = pointer[key]
 		end
 	end

@@ -577,7 +577,11 @@ local function ReplicaIncrementValue(replica_id, path_array, value)
 	-- Incrementing value:
 	local key = path_array[#path_array]
 	local old_value = pointer[key]
-	pointer[key] += value
+	if pointer[key] ~= nil then
+		pointer[key] += value
+	else
+		pointer[key] = value
+	end
 	-- Signaling listeners:
 	if old_value ~= value and listeners ~= nil then
 		listeners = listeners[1][path_array[#path_array]]
@@ -652,7 +656,11 @@ local function ReplicaIncrementValues(replica_id, path_array, values)
 	for key, value in pairs(values) do
 		-- Increment value:
 		local old_value = pointer[key]
-		pointer[key] += value
+		if pointer[key] then
+			pointer[key] += value
+		else
+			pointer[key] = value
+		end
 		incrementedValues[key] = pointer[key]
 		-- Signaling listeners:
 		if old_value ~= value and listeners ~= nil then
