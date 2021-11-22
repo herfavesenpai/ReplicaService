@@ -427,6 +427,8 @@ function Replica:SetValue(path, value)
 	end
 end
 
+
+
 function Replica:IncrementValue(path, value)
 	local path_array = (type(path) == "string") and StringPathToArray(path) or path
 	-- Apply change server-side:
@@ -590,6 +592,48 @@ function Replica:ArrayRemove(path, index) --> removed_value
 		end
 	end
 	return removed_value
+end
+
+function Replica:Contains(path, entry) -- replica_id, path_array, index
+	local path_array = (type(path) == "string") and StringPathToArray(path) or path
+	-- Getting path pointer and listener table:
+	if(path_array) then
+		local pointer = self.Data
+		for i = 1, #path_array do
+			pointer = pointer[path_array[i]]
+		end
+
+		if(pointer) then
+			for i, v in ipairs(pointer) do
+				if(v == entry) then
+					return true
+				end
+			end
+		end
+	end
+
+	return false
+end
+
+function Replica:ContainsKey(path, entry) -- replica_id, path_array, index
+	local path_array = (type(path) == "string") and StringPathToArray(path) or path
+	-- Getting path pointer and listener table:
+	if(path_array) then
+		local pointer = self.Data
+		for i = 1, #path_array do
+			pointer = pointer[path_array[i]]
+		end
+
+		if(pointer) then
+			for i, v in pairs(pointer) do
+				if(i == entry) then
+					return true
+				end
+			end
+		end
+	end
+
+	return false
 end
 
 -- Write library:
